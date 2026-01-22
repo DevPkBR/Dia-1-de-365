@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Jogo da Velha</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            color: #00adb5;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            color: #ccc;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .player-turn {
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background-color: #00adb5;
+            transition: all 0.3s ease;
+        }
+
+        .player-x {
+            background-color: #00adb5;
+        }
+
+        .player-o {
+            background-color: #ff9a3c;
+        }
+
+        .scoreboard {
+            text-align: right;
+        }
+
+        .scoreboard h3 {
+            color: #00adb5;
+            margin-bottom: 5px;
+        }
+
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 12px;
+            margin: 25px 0;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cell:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .cell.x {
+            color: #00adb5;
+            text-shadow: 0 0 10px rgba(0, 173, 181, 0.5);
+        }
+
+        .cell.o {
+            color: #ff9a3c;
+            text-shadow: 0 0 10px rgba(255, 154, 60, 0.5);
+        }
+
+        .cell.winning {
+            background-color: rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+        }
+
+        .controls {
+            margin-top: 25px;
+        }
+
+        .reset-btn {
+            background-color: #ff9a3c;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 154, 60, 0.3);
+        }
+
+        .reset-btn:hover {
+            background-color: #ff8a1c;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 154, 60, 0.4);
+        }
+
+        .message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .message.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .message-content {
+            background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(30px);
+            transition: transform 0.4s ease;
+        }
+
+        .message.active .message-content {
+            transform: translateY(0);
+        }
+
+        .message h2 {
+            color: #00adb5;
+            margin-bottom: 15px;
+            font-size: 2.2rem;
+        }
+
+        .message p {
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+        }
+
+        .close-btn {
+            background-color: #00adb5;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background-color: #0099a1;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .cell {
+                font-size: 3rem;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .scoreboard {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jogo da Velha</h1>
+        <p class="subtitle">Jogue contra um amigo no mesmo dispositivo</p>
+        
+        <div class="game-info">
+            <div class="player-turn player-x" id="player-turn">Vez do Jogador X</div>
+            <div class="scoreboard">
+                <h3>Placar</h3>
+                <div class="score">
+                    <span id="score-x">X: 0</span> | <span id="score-o">O: 0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="board" id="board">
+            <div class="cell" data-cell-index="0"></div>
+            <div class="cell" data-cell-index="1"></div>
+            <div class="cell" data-cell-index="2"></div>
+            <div class="cell" data-cell-index="3"></div>
+            <div class="cell" data-cell-index="4"></div>
+            <div class="cell" data-cell-index="5"></div>
+            <div class="cell" data-cell-index="6"></div>
+            <div class="cell" data-cell-index="7"></div>
+            <div class="cell" data-cell-index="8"></div>
+        </div>
+        
+        <div class="controls">
+            <button class="reset-btn" id="reset-btn">Reiniciar Jogo</button>
+        </div>
+        
+        <div class="instructions">
+            <p><strong>Como jogar:</strong> Os jogadores alternam colocando X e O em espaços vazios. O primeiro a alinhar 3 símbolos na horizontal, vertical ou diagonal vence!</p>
+        </div>
+    </div>
+    
+    <div class="message" id="message">
+        <div class="message-content">
+            <h2 id="message-title">Vitória!</h2>
+            <p id="message-text">O jogador X venceu a partida!</p>
+            <button class="close-btn" id="close-btn">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <script>
+        // Elementos do DOM
+        const board = document.getElementById('board');
+        const cells = document.querySelectorAll('.cell');
+        const playerTurn = document.getElementById('player-turn');
+        const resetButton = document.getElementById('reset-btn');
+        const message = document.getElementById('message');
+        const messageTitle = document.getElementById('message-title');
+        const messageText = document.getElementById('message-text');
+        const closeButton = document.getElementById('close-btn');
+        const scoreXElement = document.getElementById('score-x');
+        const scoreOElement = document.getElementById('score-o');
+        
+        // Variáveis do jogo
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+        let scores = { X: 0, O: 0 };
+        
+        // Combinações vencedoras
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Linhas
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colunas
+            [0, 4, 8], [2, 4, 6]             // Diagonais
+        ];
+        
+        // Função para atualizar a vez do jogador
+        function updatePlayerTurn() {
+            playerTurn.textContent = `Vez do Jogador ${currentPlayer}`;
+            playerTurn.className = `player-turn player-${currentPlayer.toLowerCase()}`;
+        }
+        
+        // Função para verificar se há um vencedor
+        function checkWinner() {
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                    // Marcar células vencedoras
+                    cells[a].classList.add('winning');
+                    cells[b].classList.add('winning');
+                    cells[c].classList.add('winning');
+                    
+                    return gameBoard[a];
+                }
+            }
+            
+            // Verificar empate
+            if (!gameBoard.includes('')) {
+                return 'draw';
+            }
+            
+            return null;
+        }
+        
+        // Função para lidar com o clique em uma célula
+        function handleCellClick(e) {
+            const cell = e.target;
+            const cellIndex = parseInt(cell.getAttribute('data-cell-index'));
+            
+            // Verificar se a célula já foi preenchida ou se o jogo não está ativo
+            if (gameBoard[cellIndex] !== '' || !gameActive) {
+                return;
+            }
+            
+            // Preencher a célula com o símbolo do jogador atual
+            gameBoard[cellIndex] = currentPlayer;
+            cell.textContent = currentPlayer;
+            cell.classList.add(currentPlayer.toLowerCase());
+            
+            // Verificar se há um vencedor
+            const winner = checkWinner();
+            
+            if (winner) {
+                gameActive = false;
+                
+                if (winner === 'draw') {
+                    showMessage('Empate!', 'Ninguém venceu esta rodada.');
+                } else {
+                    // Atualizar placar
+                    scores[winner]++;
+                    updateScoreboard();
+                    
+                    showMessage('Vitória!', `O jogador ${winner} venceu a partida!`);
+                }
+            } else {
+                // Alternar jogador
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                updatePlayerTurn();
+            }
+        }
+        
+        // Função para atualizar o placar
+        function updateScoreboard() {
+            scoreXElement.textContent = `X: ${scores.X}`;
+            scoreOElement.textContent = `O: ${scores.O}`;
+        }
+        
+        // Função para mostrar mensagem de resultado
+        function showMessage(title, text) {
+            messageTitle.textContent = title;
+            messageText.textContent = text;
+            message.classList.add('active');
+        }
+        
+        // Função para reiniciar o jogo
+        function resetGame() {
+            // Limpar tabuleiro
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            
+            // Limpar células
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('x', 'o', 'winning');
+            });
+            
+            // Resetar para o jogador X
+            currentPlayer = 'X';
+            updatePlayerTurn();
+            
+            // Fechar mensagem se estiver aberta
+            message.classList.remove('active');
+        }
+        
+        // Função para reiniciar o placar
+        function resetScoreboard() {
+            scores = { X: 0, O: 0 };
+            updateScoreboard();
+        }
+        
+        // Event Listeners
+        cells.forEach(cell => {
+            cell.addEventListener('click', handleCellClick);
+        });
+        
+        resetButton.addEventListener('click', resetGame);
+        
+        closeButton.addEventListener('click', () => {
+            message.classList.remove('active');
+            resetGame();
+        });
+        
+        // Event listener para reiniciar o placar com duplo clique no botão
+        resetButton.addEventListener('dblclick', resetScoreboard);
+        
+        // Inicializar o jogo
+        updatePlayerTurn();
+    </script>
+</body>
+</html>
