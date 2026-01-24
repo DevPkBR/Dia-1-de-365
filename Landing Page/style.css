@@ -1,0 +1,72 @@
+body {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; 
+    color: rgb(241, 241, 241);
+    background: url(retrato-de-barbeiro-masculino-tatuado-detem-uma-tesoura-afiada-e-uma-lamina.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    
+
+}
+
+.main {
+    margin-top: 61px;
+    width: 65vw;
+    font-size: 3.5rem;
+}
+
+.about {
+    margin-top: 20px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 1.3rem;
+    color: rgb(255, 255, 255);
+}
+
+.buttons {
+    margin-top: 50px;
+    display: flex;
+    gap: 15px;
+    color: rgb(255, 255, 255);
+    
+    
+}
+
+.but-left {
+    padding: 15px;
+    border: 1px solid  rgb(231, 231, 231);
+    border-radius: 5px;
+    color: black;
+    background-color: rgb(231, 231, 231);
+    font-size: 0.8rem;
+}
+
+.but-right {
+    padding: 15px;
+    border: 1px solid;
+    border-radius: 5px;
+    font-size: 0.8rem;
+}
+
+.buttons,a {
+    color:  inherit;
+    text-decoration: none;
+
+}
+
+.but-left:hover{
+    color: darkslategrey;
+    background-color:beige ;
+}
+
+.but-right:hover{
+    color: darkslategrey;
+    background-color:beige ;
+    border: beige;
+}
+
+footer {
+    margin-top: 70px;
+}
