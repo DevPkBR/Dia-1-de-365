@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Único Arquivo</title>
+    <style>
+        /* CSS - Estilização */
+        :root {
+            --cor-foco: #e74c3c;
+            --cor-pausa: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background 0.5s ease;
+            color: white;
+            background-color: var(--cor-foco);
+        }
+
+        body.pausa { background-color: var(--cor-pausa); }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 300px;
+        }
+
+        h1 { margin-top: 0; text-transform: uppercase; letter-spacing: 2px; }
+
+        .timer {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .controls button, .modes button {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .controls button {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            background: white;
+            color: #333;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .modes { display: flex; gap: 10px; margin-top: 15px; }
+
+        .modes button {
+            flex: 1;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        button:active { transform: scale(0.95); }
+        button:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="status">Foco</h1>
+        <div class="timer" id="timer">25:00</div>
+        
+        <div class="controls">
+            <button id="startBtn">Iniciar</button>
+            <button id="resetBtn">Resetar</button>
+        </div>
+
+        <div class="modes">
+            <button onclick="mudarModo('foco')">Modo Foco</button>
+            <button onclick="mudarModo('pausa')">Pausa Curta</button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript - Lógica
+        let tempoSegundos = 25 * 60;
+        let intervalo = null;
+        let modoAtivo = 'foco';
+
+        const display = document.getElementById('timer');
+        const statusTxt = document.getElementById('status');
+        const btnStart = document.getElementById('startBtn');
+
+        function atualizarTela() {
+            const min = Math.floor(tempoSegundos / 60);
+            const seg = tempoSegundos % 60;
+            display.textContent = `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
+        }
+
+        function gerenciarTimer() {
+            if (intervalo) {
+                // Pausar
+                clearInterval(intervalo);
+                intervalo = null;
+                btnStart.textContent = "Continuar";
+            } else {
+                // Iniciar
+                btnStart.textContent = "Pausar";
+                intervalo = setInterval(() => {
+                    if (tempoSegundos > 0) {
+                        tempoSegundos--;
+                        atualizarTela();
+                    } else {
+                        clearInterval(intervalo);
+                        alert("Tempo esgotado!");
+                        resetar();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetar() {
+            clearInterval(intervalo);
+            intervalo = null;
+            tempoSegundos = (modoAtivo === 'foco') ? 25 * 60 : 5 * 60;
+            btnStart.textContent = "Iniciar";
+            atualizarTela();
+        }
+
+        function mudarModo(novoModo) {
+            modoAtivo = novoModo;
+            document.body.className = (novoModo === 'pausa') ? 'pausa' : '';
+            statusTxt.textContent = (novoModo === 'pausa') ? 'Pausa' : 'Foco';
+            resetar();
+        }
+
+        btnStart.addEventListener('click', gerenciarTimer);
+        document.getElementById('resetBtn').addEventListener('click', resetar);
+
+        // Inicia a tela
+        atualizarTela();
+    </script>
+</body>
+</html>
