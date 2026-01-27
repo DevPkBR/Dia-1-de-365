@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Lista de Tarefas</title>
+    <style>
+        /* CSS - Estilização */
+        :root {
+            --primary-color: #6c5ce7;
+            --bg-color: #f0f2f5;
+            --text-color: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 50px;
+        }
+
+        .container {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        button#add-btn {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+
+        button#add-btn:hover {
+            opacity: 0.9;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            transition: all 0.2s;
+        }
+
+        li.completed span {
+            text-decoration: line-through;
+            color: #b2bec3;
+        }
+
+        .task-text {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .delete-btn {
+            background: #ff7675;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .delete-btn:hover {
+            background: #d63031;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Lista de Tarefas</h2>
+        
+        <div class="input-group">
+            <input type="text" id="todo-input" placeholder="O que precisa ser feito?">
+            <button id="add-btn">Adicionar</button>
+        </div>
+
+        <ul id="todo-list">
+            </ul>
+    </div>
+
+    <script>
+        // JS - Lógica de Funcionamento
+        const input = document.getElementById('todo-input');
+        const addBtn = document.getElementById('add-btn');
+        const todoList = document.getElementById('todo-list');
+
+        function addTask() {
+            const taskValue = input.value.trim();
+            
+            if (taskValue === '') {
+                alert("Por favor, digite uma tarefa!");
+                return;
+            }
+
+            // Criar o elemento da lista (li)
+            const li = document.createElement('li');
+            
+            li.innerHTML = `
+                <span class="task-text">${taskValue}</span>
+                <button class="delete-btn">Excluir</button>
+            `;
+
+            // Clique para marcar como concluída
+            li.querySelector('.task-text').addEventListener('click', function() {
+                li.classList.toggle('completed');
+            });
+
+            // Clique para excluir
+            li.querySelector('.delete-btn').addEventListener('click', function() {
+                li.remove();
+            });
+
+            // Adicionar à lista e limpar input
+            todoList.appendChild(li);
+            input.value = '';
+            input.focus();
+        }
+
+        // Evento de clique no botão
+        addBtn.addEventListener('click', addTask);
+
+        // Evento de apertar "Enter" no teclado
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+    </script>
+
+</body>
+</html>
