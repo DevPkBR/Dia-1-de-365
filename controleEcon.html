@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Controle de Gastos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .container {
+      background: #fff;
+      width: 350px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .saldo {
+      text-align: center;
+      font-size: 20px;
+      margin: 15px 0;
+    }
+
+    .positivo {
+      color: green;
+    }
+
+    .negativo {
+      color: red;
+    }
+
+    form input, form select, form button {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 15px;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      margin-bottom: 5px;
+      border-left: 5px solid;
+      background: #eee;
+    }
+
+    li.entrada {
+      border-color: green;
+    }
+
+    li.saida {
+      border-color: red;
+    }
+
+    li button {
+      background: red;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>💰 Controle de Gastos</h2>
+
+    <div class="saldo">
+      Saldo: R$ <span id="saldo">0.00</span>
+    </div>
+
+    <form id="form">
+      <input type="text" id="descricao" placeholder="Descrição" required>
+      <input type="number" id="valor" placeholder="Valor" required>
+      
+      <select id="tipo">
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
+
+      <button type="submit">Adicionar</button>
+    </form>
+
+    <ul id="lista"></ul>
+  </div>
+
+  <script>
+    const form = document.getElementById("form");
+    const lista = document.getElementById("lista");
+    const saldoEl = document.getElementById("saldo");
+
+    let transacoes = JSON.parse(localStorage.getItem("transacoes")) || [];
+
+    function atualizarTela() {
+      lista.innerHTML = "";
+      let saldo = 0;
+
+      transacoes.forEach((t, index) => {
+        const li = document.createElement("li");
+        li.classList.add(t.tipo);
+
+        li.innerHTML = `
+          ${t.descricao} - R$ ${t.valor.toFixed(2)}
+          <button onclick="remover(${index})">X</button>
+        `;
+
+        lista.appendChild(li);
+
+        saldo += t.tipo === "entrada" ? t.valor : -t.valor;
+      });
+
+      saldoEl.textContent = saldo.toFixed(2);
+      saldoEl.className = saldo >= 0 ? "positivo" : "negativo";
+
+      localStorage.setItem("transacoes", JSON.stringify(transacoes));
+    }
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const descricao = document.getElementById("descricao").value;
+      const valor = Number(document.getElementById("valor").value);
+      const tipo = document.getElementById("tipo").value;
+
+      transacoes.push({ descricao, valor, tipo });
+
+      form.reset();
+      atualizarTela();
+    });
+
+    function remover(index) {
+      transacoes.splice(index, 1);
+      atualizarTela();
+    }
+
+    atualizarTela();
+  </script>
+
+</body>
+</html>
