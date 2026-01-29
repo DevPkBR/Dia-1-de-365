@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird Clone</title>
+    <style>
+        body { margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; background: #222; font-family: Arial, sans-serif; }
+        canvas { border: 2px solid #fff; background: #70c5ce; }
+        .info { position: absolute; top: 10px; color: white; text-align: center; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div class="info">
+        <h1>Score: <span id="score">0</span></h1>
+        <p>Clique ou pressione Espaço para pular</p>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+
+        // Configurações do Jogo
+        canvas.width = 320;
+        canvas.height = 480;
+
+        let bird = { x: 50, y: 150, w: 20, h: 20, gravity: 0.6, velocity: 0, jump: -8 };
+        let pipes = [];
+        let score = 0;
+        let frame = 0;
+        let gameOver = false;
+
+        // Controle
+        const jumpAction = () => {
+            if (gameOver) {
+                resetGame();
+            } else {
+                bird.velocity = bird.jump;
+            }
+        };
+
+        window.addEventListener('keydown', (e) => { if (e.code === 'Space') jumpAction(); });
+        canvas.addEventListener('mousedown', jumpAction);
+
+        function resetGame() {
+            bird.y = 150;
+            bird.velocity = 0;
+            pipes = [];
+            score = 0;
+            frame = 0;
+            gameOver = false;
+            scoreElement.innerText = score;
+            loop();
+        }
+
+        function createPipe() {
+            let gap = 120;
+            let minHeight = 50;
+            let height = Math.floor(Math.random() * (canvas.height - gap - (minHeight * 2))) + minHeight;
+            
+            pipes.push({
+                x: canvas.width,
+                top: height,
+                bottom: canvas.height - height - gap,
+                passed: false
+            });
+        }
+
+        function loop() {
+            if (gameOver) return;
+
+            // 1. Limpar tela
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Gravidade do Pássaro
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            // 3. Desenhar Pássaro
+            ctx.fillStyle = '#f1c40f';
+            ctx.fillRect(bird.x, bird.y, bird.w, bird.h);
+
+            // 4. Canos
+            if (frame % 90 === 0) createPipe();
+
+            for (let i = pipes.length - 1; i >= 0; i--) {
+                let p = pipes[i];
+                p.x -= 2;
+
+                ctx.fillStyle = '#2ecc71';
+                // Cano de cima
+                ctx.fillRect(p.x, 0, 40, p.top);
+                // Cano de baixo
+                ctx.fillRect(p.x, canvas.height - p.bottom, 40, p.bottom);
+
+                // Colisão
+                if (bird.x < p.x + 40 && bird.x + bird.w > p.x &&
+                    (bird.y < p.top || bird.y + bird.h > canvas.height - p.bottom)) {
+                    gameOver = true;
+                }
+
+                // Pontuação
+                if (!p.passed && p.x + 40 < bird.x) {
+                    score++;
+                    p.passed = true;
+                    scoreElement.innerText = score;
+                }
+
+                if (p.x < -40) pipes.splice(i, 1);
+            }
+
+            // Chão e Teto
+            if (bird.y + bird.h > canvas.height || bird.y < 0) gameOver = true;
+
+            if (gameOver) {
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.fillText('GAME OVER - Clique para reiniciar', 60, canvas.height / 2);
+            }
+
+            frame++;
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+</html>
